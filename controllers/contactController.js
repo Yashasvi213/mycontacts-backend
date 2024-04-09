@@ -1,13 +1,10 @@
 const contacts= require("../models/contactModel");
 
 const asyncHandler=require("express-async-handler")
+
 const getContact=(async(req,res)=>{
-    const{email,phone,name}=req.body;
-    const contact=await contacts.find({
-        name,
-        email,
-        phone
-    });
+    
+    const contact=await contacts.find();
     res.json({contact});
 })
 
@@ -27,15 +24,33 @@ const createContact=asyncHandler(async(req,res)=>{
 })
 
 const updateContact=asyncHandler(async(req,res)=>{
-    res.json({message:`Update contact for ${req.params.id}`});
+    const contact= await Contact.findById(req.params.id);
+    if(!contact){
+        res.status(err);
+        throw new Error("Not found ");
+    }
+
+    const updateContact=await Contact.findByIdAndUpdate(
+        req.params.id,
+        req.body,
+        {new:true}
+    );
+    res.json({updateContact});
 })
 
 const deleteContact=asyncHandler(async(req,res)=>{
-    res.json({message:`Delete contact for id ${req.params.id}`});
+    const contact= await Contact.findById(req.params.id);
+    await contact.remove();
+    res.json({contact});
 })
 
 const getOneContact=asyncHandler(async(req,res)=>{
-    res.json({message:`Get contact for id ${req.params.id}`});
+    const contact= await Contact.findById(req.params.id);
+    if(!contact){
+        res.status(err);
+        throw new Error("Not found ");
+    }
+    res.json({contact});
 })
 
 module.exports={getContact, createContact,getOneContact, deleteContact, updateContact};
